@@ -37,8 +37,12 @@ or add it to browser configuration.
 
 1. Revoke any Resend key that was shared outside the Resend dashboard, then
    create a replacement there.
-2. Run `migrations/20260905_email_campaigns.sql` in the Supabase SQL Editor.
-3. Deploy the function with `supabase functions deploy admin-email`.
+2. Run `migrations/20260905_email_campaigns.sql`, then
+   `migrations/20260905_email_programs.sql`, in the Supabase SQL Editor.
+3. Deploy the owner-mail function with `supabase functions deploy admin-email`.
+   Deploy the scheduler with
+   `supabase functions deploy email-program-scheduler --no-verify-jwt`; its
+   separate cron secret is checked by the function before any work is done.
 4. Set these Supabase Edge Function secrets directly in the Supabase dashboard
    or with the Supabase CLI:
    - `RESEND_API_KEY` — the newly created Resend key
@@ -48,10 +52,12 @@ or add it to browser configuration.
 5. In GitHub repository secrets, set only `KAISHI_EMAIL_CRON_SECRET` to the
    same random value. The scheduled workflow never receives the Resend key.
 
-The Friday workflow calls the function hourly. The function itself uses the
-`Europe/London` time zone and sends only once at 17:00, so UK daylight-saving
-changes do not alter the learner-facing schedule. Email automation is disabled
-until the owner enables it in the Admin area.
+The hourly GitHub Actions workflow calls the scheduler. It uses the
+`Europe/London` time zone, so UK daylight-saving changes do not alter the
+learner-facing schedule. Each program is disabled until the owner enables it in
+the Admin area: Friday return-to-learning reminders, Sunday weekly recaps,
+monthly Sensei letters, and onboarding nudges. Milestone emails are not part of
+this phase.
 
 ## Security model
 

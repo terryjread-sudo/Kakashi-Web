@@ -1,8 +1,8 @@
-name: Weekly learner re-engagement email
+name: Learner email automations
 
 on:
   schedule:
-    - cron: '0 * * * 5'
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -12,12 +12,12 @@ jobs:
   reengage:
     runs-on: ubuntu-latest
     steps:
-      - name: Invoke the secured email scheduler
+      - name: Invoke the secured email-program scheduler
         env:
           CRON_SECRET: ${{ secrets.KAISHI_EMAIL_CRON_SECRET }}
         run: |
           curl --fail --silent --show-error --retry 2 \
-            -X POST 'https://wcnsvwbhfstgadqnaarr.supabase.co/functions/v1/admin-email' \
+            -X POST 'https://wcnsvwbhfstgadqnaarr.supabase.co/functions/v1/email-program-scheduler' \
             -H "x-kaishi-cron-secret: ${CRON_SECRET}" \
             -H 'content-type: application/json' \
-            --data '{"action":"runReengagement"}'
+            --data '{}'
